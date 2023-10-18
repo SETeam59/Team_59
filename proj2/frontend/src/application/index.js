@@ -1,63 +1,43 @@
-import { shuffle } from "lodash";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Header from "../components/Header";
+import Home from "../components/Home";
+import EmptyBoard from "../components/EmptyBoard";
 import boardsSlice from "../redux/boardsSlice";
-import Task from "./Task";
 
-function Column({ colIndex }) {
-  const colors = [
-    "bg-red-500",
-    "bg-orange-500",
-    "bg-blue-500",
-    "bg-purple-500",
-    "bg-green-500",
-    "bg-indigo-500",
-    "bg-yellow-500",
-    "bg-pink-500",
-    "bg-sky-500",
-  ];
-
+function ApplicationPage({ initialData, logout, getData }) {
+  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
   const dispatch = useDispatch();
-  const [color, setColor] = useState(null);
   const boards = useSelector((state) => state.boards);
-  const board = boards.find((board) => board.isActive === true);
-  const col = board.columns.find((col, i) => i === colIndex);
+  const activeBoard = boards.find((board) => board.isActive);
   useEffect(() => {
-    setColor(shuffle(colors).pop());
-  }, [dispatch]);
-
-  const handleOnDrop = (e) => {
-    const { prevColIndex, taskIndex } = JSON.parse(
-      e.dataTransfer.getData("text")
-    );
-
-    if (colIndex !== prevColIndex) {
-      dispatch(
-        boardsSlice.actions.dragTask({ colIndex, prevColIndex, taskIndex })
-      );
-    }
-  };
-
-  const handleOnDragOver = (e) => {
-    e.preventDefault();
-  };
-
+    getData();
+  }, []);
+  if (!activeBoard && boards.length > 0)
+    dispatch(boardsSlice.actions.setBoardActive({ index: 0 }));
   return (
-    <div
-      onDrop={handleOnDrop}
-      onDragOver={handleOnDragOver}
-      className="scrollbar-hide   mx-5 pt-[90px] min-w-[280px] "
-    >
-      <p className=" font-semibold flex  items-center  gap-2 tracking-widest md:tracking-[.2em] text-[#828fa3]">
-        <div className={`rounded-full w-4 h-4 ${color} `} />
-        {col.name} ({col.tasks.length})
-      </p>
-
-      {col.tasks.map((task, index) => (
-        <Task key={index} taskIndex={index} colIndex={colIndex} />
-      ))}
+    <div className=" overflow-hidden  overflow-x-scroll">
+      <>
+        {boards.length > 0 ? (
+          <>
+            <Header
+              setIsBoardModalOpen={setIsBoardModalOpen}
+              isBoardModalOpen={isBoardModalOpen}
+              logout={logout}
+            />
+            <Home
+              setIsBoardModalOpen={setIsBoardModalOpen}
+              isBoardModalOpen={isBoardModalOpen}
+            />
+          </>
+        ) : (
+          <>
+            <EmptyBoard type="add" />
+          </>
+        )}
+      </>
     </div>
   );
 }
 
-export default Column;
+export default ApplicationPage;
