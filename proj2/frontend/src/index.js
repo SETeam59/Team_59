@@ -1,17 +1,43 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import './static/index.css'
-import App from './App'
-import reportWebVitals from './reportWebVitals'
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Header from "../components/Header";
+import Home from "../components/Home";
+import EmptyBoard from "../components/EmptyBoard";
+import boardsSlice from "../redux/boardsSlice";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+function ApplicationPage({ initialData, logout, getData }) {
+  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
+  const dispatch = useDispatch();
+  const boards = useSelector((state) => state.boards);
+  const activeBoard = boards.find((board) => board.isActive);
+  useEffect(() => {
+    getData();
+  }, []);
+  if (!activeBoard && boards.length > 0)
+    dispatch(boardsSlice.actions.setBoardActive({ index: 0 }));
+  return (
+    <div className=" overflow-hidden  overflow-x-scroll">
+      <>
+        {boards.length > 0 ? (
+          <>
+            <Header
+              setIsBoardModalOpen={setIsBoardModalOpen}
+              isBoardModalOpen={isBoardModalOpen}
+              logout={logout}
+            />
+            <Home
+              setIsBoardModalOpen={setIsBoardModalOpen}
+              isBoardModalOpen={isBoardModalOpen}
+            />
+          </>
+        ) : (
+          <>
+            <EmptyBoard type="add" />
+          </>
+        )}
+      </>
+    </div>
+  );
+}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals()
+export default ApplicationPage;
