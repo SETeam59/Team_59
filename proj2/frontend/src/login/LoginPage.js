@@ -13,10 +13,12 @@ const LoginPage = ({ side }) => {
     password: "",
   });
 
+  /** Users can switch between the "Login" and "Signup" tabs */
   const handleTabChange = (tabKey) => {
     setActiveTab(tabKey);
   };
 
+  /** Login functionality called when button is clicked */
   const handleLogin = () => {
     console.log("Login click");
     getToken(loginData)
@@ -32,6 +34,7 @@ const LoginPage = ({ side }) => {
       });
   };
 
+  /** Signup functionality called when button is clicked */
   const handleSignup = () => {
     console.log("Signup click");
     signUp(signupData)
@@ -43,6 +46,7 @@ const LoginPage = ({ side }) => {
       });
   };
 
+  /** Changing HTML depending on which of login and signup is active */
   return (
     <div className="auth-wrapper">
       <div className="auth-inner">
